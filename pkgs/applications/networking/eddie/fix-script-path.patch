@@ -1,0 +1,12 @@
+diff --git a/src/App.CLI.Linux/App.CLI.Linux.net6.csproj b/src/App.CLI.Linux/App.CLI.Linux.net6.csproj
+index baf165c..6a34ae7 100644
+--- a/src/App.CLI.Linux/App.CLI.Linux.net6.csproj
++++ b/src/App.CLI.Linux/App.CLI.Linux.net6.csproj
+@@ -48,6 +48,6 @@
+ 		</PackageReference>
+ 	</ItemGroup>
+ 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+-	  <Exec Command="$(ProjectDir)\..\eddie.windows.postbuild.bat &quot;$(TargetDir)&quot; cli $(PlatformName) $(ConfigurationName)" />
++		<Exec Command="$(ProjectDir)/../eddie.linux.postbuild.sh &quot;$(TargetDir)&quot; cli $(PlatformName) $(ConfigurationName)" />
+ 	</Target>
+ </Project>

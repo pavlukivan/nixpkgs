@@ -614,6 +614,12 @@ with pkgs;
     };
   };
 
+  eddie-cli = callPackage ../applications/networking/eddie { };
+
+  eddie-ui = callPackage ../applications/networking/eddie { project = "ui"; };
+
+  eddie-ui3 = callPackage ../applications/networking/eddie { project = "ui3"; };
+
   edgedb = callPackage ../tools/networking/edgedb {
     inherit (darwin.apple_sdk.frameworks) CoreServices Security;
   };
