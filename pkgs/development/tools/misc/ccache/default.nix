@@ -86,7 +86,9 @@ stdenv.mkDerivation (finalAttrs: {
       };
       inherit (unwrappedCC) lib;
       nativeBuildInputs = [ makeWrapper ];
-      buildCommand = ''
+      buildCommand = let
+        targetPrefix = lib.optionalString (unwrappedCC.targetConfig != null) "${unwrappedCC.targetConfig}-";
+      in ''
         mkdir -p $out/bin
 
         wrap() {
@@ -98,12 +100,12 @@ stdenv.mkDerivation (finalAttrs: {
           fi
         }
 
-        wrap cc
-        wrap c++
-        wrap gcc
-        wrap g++
-        wrap clang
-        wrap clang++
+        wrap ${targetPrefix}cc
+        wrap ${targetPrefix}c++
+        wrap ${targetPrefix}gcc
+        wrap ${targetPrefix}g++
+        wrap ${targetPrefix}clang
+        wrap ${targetPrefix}clang++
 
         for executable in $(ls ${unwrappedCC}/bin); do
           if [ ! -x "$out/bin/$executable" ]; then
