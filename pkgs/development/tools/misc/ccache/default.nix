@@ -129,6 +129,7 @@ stdenv.mkDerivation (finalAttrs: {
       builtins.replaceStrings [ "." ] [ "_" ] finalAttrs.version
     }";
     license = licenses.gpl3Plus;
+    mainProgram = "ccache";
     maintainers = with maintainers; [ kira-bruneau r-burns ];
     platforms = platforms.unix;
   };
