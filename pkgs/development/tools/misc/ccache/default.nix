@@ -87,7 +87,8 @@ stdenv.mkDerivation (finalAttrs: {
       inherit (unwrappedCC) lib;
       nativeBuildInputs = [ makeWrapper ];
       buildCommand = let
-        targetPrefix = lib.optionalString (unwrappedCC.targetConfig != null) "${unwrappedCC.targetConfig}-";
+        # Clang does not yet have targetConfig in passthru.
+        targetPrefix = if stdenv.cc.isGNU then (lib.optionalString (unwrappedCC.targetConfig != null) "${unwrappedCC.targetConfig}-") else stdenv.cc.targetPrefix;
       in ''
         mkdir -p $out/bin
 
