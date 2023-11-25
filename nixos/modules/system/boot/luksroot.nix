@@ -152,14 +152,6 @@ let
     cschange = "cryptsetup luksChangeKey ${dev.device} ${optionalString (dev.header != null) "--header=${dev.header}"}";
     fido2luksCredentials = dev.fido2.credentials ++ optional (dev.fido2.credential != null) dev.fido2.credential;
   in ''
-    # Wait for luksRoot (and optionally keyFile and/or header) to appear, e.g.
-    # if on a USB drive.
-    wait_target "device" ${dev.device} || die "${dev.device} is unavailable"
-
-    ${optionalString (dev.header != null) ''
-      wait_target "header" ${dev.header} || die "${dev.header} is unavailable"
-    ''}
-
     try_empty_passphrase() {
         ${if dev.tryEmptyPassphrase then ''
              echo "Trying empty passphrase!"
@@ -478,17 +470,27 @@ let
     }
     ''}
 
-    # commands to run right before we mount our device
-    ${dev.preOpenCommands}
+    __luks_run() {
+      ${optionalString (dev.header != null) ''
+        wait_target "header" ${dev.header} || die "${dev.header} is unavailable"
+      ''}
 
-    ${if (luks.yubikeySupport && (dev.yubikey != null)) || (luks.gpgSupport && (dev.gpgCard != null)) || (luks.fido2Support && fido2luksCredentials != []) then ''
-    open_with_hardware
-    '' else ''
-    open_normally
-    ''}
+      # commands to run right before we mount our device
+      ${dev.preOpenCommands}
 
-    # commands to run right after we mounted our device
-    ${dev.postOpenCommands}
+      ${if (luks.yubikeySupport && (dev.yubikey != null)) || (luks.gpgSupport && (dev.gpgCard != null)) || (luks.fido2Support && fido2luksCredentials != []) then ''
+      open_with_hardware
+      '' else ''
+      open_normally
+      ''}
+
+      # commands to run right after we mounted our device
+      ${dev.postOpenCommands}
+    }
+
+    # Wait for luksRoot (and optionally keyFile and/or header) to appear, e.g.
+    # if on a USB drive.
+    wait_target "device" ${dev.device} && __luks_run || echo "${dev.device} is unavailable" >&2
   '';
 
   askPass = pkgs.writeScriptBin "cryptsetup-askpass" ''
