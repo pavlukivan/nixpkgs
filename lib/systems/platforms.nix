@@ -30,15 +30,15 @@ rec {
       target = "vmlinux";
       autoModules = true;
       # avoid driver/FS trouble arising from unusual page size
-      extraConfig = ''
-        PPC_64K_PAGES n
-        PPC_4K_PAGES y
-        IPV6 y
+      extraStructuredConfig = with lib.kernel; {
+        PPC_64K_PAGES = no;
+        PPC_4K_PAGES = yes;
+        IPV6 = yes;
 
-        ATA_BMDMA y
-        ATA_SFF y
-        VIRTIO_MENU y
-      '';
+        ATA_BMDMA = yes;
+        ATA_SFF = yes;
+        VIRTIO_MENU = yes;
+      };
     };
   };
 
@@ -52,16 +52,16 @@ rec {
 
       baseConfig = "multi_v5_defconfig";
       autoModules = false;
-      extraConfig = ''
+      extraStructuredConfig = with lib.kernel; {
         # Ubi for the mtd
-        MTD_UBI y
-        UBIFS_FS y
-        UBIFS_FS_XATTR y
-        UBIFS_FS_ADVANCED_COMPR y
-        UBIFS_FS_LZO y
-        UBIFS_FS_ZLIB y
-        UBIFS_FS_DEBUG n
-      '';
+        MTD_UBI = yes;
+        UBIFS_FS = yes;
+        UBIFS_FS_XATTR = yes;
+        UBIFS_FS_ADVANCED_COMPR = yes;
+        UBIFS_FS_LZO = yes;
+        UBIFS_FS_ZLIB = yes;
+        UBIFS_FS_DEBUG = no;
+      };
       makeFlags = [ "LOADADDR=0x8000" ];
       target = "uImage";
       # TODO reenable once manual-config's config actually builds a .dtb and this is checked to be working
@@ -78,104 +78,104 @@ rec {
 
       baseConfig = "multi_v5_defconfig";
       autoModules = false;
-      extraConfig = ''
-        BLK_DEV_RAM y
-        BLK_DEV_INITRD y
-        BLK_DEV_CRYPTOLOOP m
-        BLK_DEV_DM m
-        DM_CRYPT m
-        MD y
-        REISERFS_FS m
-        BTRFS_FS m
-        XFS_FS m
-        JFS_FS m
-        EXT4_FS m
-        USB_STORAGE_CYPRESS_ATACB m
+      extraStructuredConfig = with lib.kernel; {
+        BLK_DEV_RAM = yes;
+        BLK_DEV_INITRD = yes;
+        BLK_DEV_CRYPTOLOOP = module;
+        BLK_DEV_DM = module;
+        DM_CRYPT = module;
+        MD = yes;
+        REISERFS_FS = module;
+        BTRFS_FS = module;
+        XFS_FS = module;
+        JFS_FS = module;
+        EXT4_FS = module;
+        USB_STORAGE_CYPRESS_ATACB = module;
 
         # mv cesa requires this sw fallback, for mv-sha1
-        CRYPTO_SHA1 y
+        CRYPTO_SHA1 = yes;
         # Fast crypto
-        CRYPTO_TWOFISH y
-        CRYPTO_TWOFISH_COMMON y
-        CRYPTO_BLOWFISH y
-        CRYPTO_BLOWFISH_COMMON y
+        CRYPTO_TWOFISH = yes;
+        CRYPTO_TWOFISH_COMMON = yes;
+        CRYPTO_BLOWFISH = yes;
+        CRYPTO_BLOWFISH_COMMON = yes;
 
-        IP_PNP y
-        IP_PNP_DHCP y
-        NFS_FS y
-        ROOT_NFS y
-        TUN m
-        NFS_V4 y
-        NFS_V4_1 y
-        NFS_FSCACHE y
-        NFSD m
-        NFSD_V2_ACL y
-        NFSD_V3 y
-        NFSD_V3_ACL y
-        NFSD_V4 y
-        NETFILTER y
-        IP_NF_IPTABLES y
-        IP_NF_FILTER y
-        IP_NF_MATCH_ADDRTYPE y
-        IP_NF_TARGET_LOG y
-        IP_NF_MANGLE y
-        IPV6 m
-        VLAN_8021Q m
+        IP_PNP = yes;
+        IP_PNP_DHCP = yes;
+        NFS_FS = yes;
+        ROOT_NFS = yes;
+        TUN = module;
+        NFS_V4 = yes;
+        NFS_V4_1 = yes;
+        NFS_FSCACHE = yes;
+        NFSD = module;
+        NFSD_V2_ACL = yes;
+        NFSD_V3 = yes;
+        NFSD_V3_ACL = yes;
+        NFSD_V4 = yes;
+        NETFILTER = yes;
+        IP_NF_IPTABLES = yes;
+        IP_NF_FILTER = yes;
+        IP_NF_MATCH_ADDRTYPE = yes;
+        IP_NF_TARGET_LOG = yes;
+        IP_NF_MANGLE = yes;
+        IPV6 = module;
+        VLAN_8021Q = module;
 
-        CIFS y
-        CIFS_XATTR y
-        CIFS_POSIX y
-        CIFS_FSCACHE y
-        CIFS_ACL y
+        CIFS = yes;
+        CIFS_XATTR = yes;
+        CIFS_POSIX = yes;
+        CIFS_FSCACHE = yes;
+        CIFS_ACL = yes;
 
-        WATCHDOG y
-        WATCHDOG_CORE y
-        ORION_WATCHDOG m
+        WATCHDOG = yes;
+        WATCHDOG_CORE = yes;
+        ORION_WATCHDOG = module;
 
-        ZRAM m
-        NETCONSOLE m
+        ZRAM = module;
+        NETCONSOLE = module;
 
         # Disable OABI to have seccomp_filter (required for systemd)
         # https://github.com/raspberrypi/firmware/issues/651
-        OABI_COMPAT n
+        OABI_COMPAT = no;
 
         # Fail to build
-        DRM n
-        SCSI_ADVANSYS n
-        USB_ISP1362_HCD n
-        SND_SOC n
-        SND_ALI5451 n
-        FB_SAVAGE n
-        SCSI_NSP32 n
-        ATA_SFF n
-        SUNGEM n
-        IRDA n
-        ATM_HE n
-        SCSI_ACARD n
-        BLK_DEV_CMD640_ENHANCED n
+        DRM = no;
+        SCSI_ADVANSYS = no;
+        USB_ISP1362_HCD = no;
+        SND_SOC = no;
+        SND_ALI5451 = no;
+        FB_SAVAGE = no;
+        SCSI_NSP32 = no;
+        ATA_SFF = no;
+        SUNGEM = no;
+        IRDA = no;
+        ATM_HE = no;
+        SCSI_ACARD = no;
+        BLK_DEV_CMD640_ENHANCED = no;
 
-        FUSE_FS m
+        FUSE_FS = module;
 
         # systemd uses cgroups
-        CGROUPS y
+        CGROUPS = yes;
 
         # Latencytop
-        LATENCYTOP y
+        LATENCYTOP = yes;
 
         # Ubi for the mtd
-        MTD_UBI y
-        UBIFS_FS y
-        UBIFS_FS_XATTR y
-        UBIFS_FS_ADVANCED_COMPR y
-        UBIFS_FS_LZO y
-        UBIFS_FS_ZLIB y
-        UBIFS_FS_DEBUG n
+        MTD_UBI = yes;
+        UBIFS_FS = yes;
+        UBIFS_FS_XATTR = yes;
+        UBIFS_FS_ADVANCED_COMPR = yes;
+        UBIFS_FS_LZO = yes;
+        UBIFS_FS_ZLIB = yes;
+        UBIFS_FS_DEBUG = no;
 
         # Kdb, for kernel troubles
-        KGDB y
-        KGDB_SERIAL_CONSOLE y
-        KGDB_KDB y
-      '';
+        KGDB = yes;
+        KGDB_SERIAL_CONSOLE = yes;
+        KGDB_KDB = yes;
+      };
       makeFlags = [ "LOADADDR=0x0200000" ];
       target = "uImage";
       DTB = true; # Beyond 3.10
@@ -193,11 +193,11 @@ rec {
       DTB = true;
       autoModules = true;
       preferBuiltin = true;
-      extraConfig = ''
+      extraStructuredConfig = with lib.kernel; {
         # Disable OABI to have seccomp_filter (required for systemd)
         # https://github.com/raspberrypi/firmware/issues/651
-        OABI_COMPAT n
-      '';
+        OABI_COMPAT = no;
+      };
       target = "zImage";
     };
     gcc = {
@@ -254,16 +254,16 @@ rec {
       name = "utilite";
       maseConfig = "multi_v7_defconfig";
       autoModules = false;
-      extraConfig = ''
+      extraStructuredConfig = with lib.kernel; {
         # Ubi for the mtd
-        MTD_UBI y
-        UBIFS_FS y
-        UBIFS_FS_XATTR y
-        UBIFS_FS_ADVANCED_COMPR y
-        UBIFS_FS_LZO y
-        UBIFS_FS_ZLIB y
-        UBIFS_FS_DEBUG n
-      '';
+        MTD_UBI = yes;
+        UBIFS_FS = yes;
+        UBIFS_FS_XATTR = yes;
+        UBIFS_FS_ADVANCED_COMPR = yes;
+        UBIFS_FS_LZO = yes;
+        UBIFS_FS_ZLIB = yes;
+        UBIFS_FS_DEBUG = no;
+      };
       makeFlags = [ "LOADADDR=0x10800000" ];
       target = "uImage";
       DTB = true;
@@ -287,7 +287,7 @@ rec {
       name = "beaglebone";
       baseConfig = "bb.org_defconfig";
       autoModules = false;
-      extraConfig = ""; # TBD kernel config
+      extraStructuredConfig = with lib.kernel; { }; # TBD kernel config
       target = "zImage";
     };
   };
@@ -311,26 +311,26 @@ rec {
       autoModules = true;
       preferBuiltin = true;
       target = "zImage";
-      extraConfig = ''
+      extraStructuredConfig = with lib.kernel; {
         # Serial port for Raspberry Pi 3. Wasn't included in ARMv7 defconfig
         # until 4.17.
-        SERIAL_8250_BCM2835AUX y
-        SERIAL_8250_EXTENDED y
-        SERIAL_8250_SHARE_IRQ y
+        SERIAL_8250_BCM2835AUX = yes;
+        SERIAL_8250_EXTENDED = yes;
+        SERIAL_8250_SHARE_IRQ = yes;
 
         # Hangs ODROID-XU4
-        ARM_BIG_LITTLE_CPUIDLE n
+        ARM_BIG_LITTLE_CPUIDLE = no;
 
         # Disable OABI to have seccomp_filter (required for systemd)
         # https://github.com/raspberrypi/firmware/issues/651
-        OABI_COMPAT n
+        OABI_COMPAT = no;
 
         # >=5.12 fails with:
         # drivers/net/ethernet/micrel/ks8851_common.o: in function `ks8851_probe_common':
         # ks8851_common.c:(.text+0x179c): undefined reference to `__this_module'
         # See: https://lore.kernel.org/netdev/20210116164828.40545-1-marex@denx.de/T/
-        KS8851_MLL y
-      '';
+        KS8851_MLL = yes;
+      };
     };
     gcc = {
       # Some table about fpu flags:
@@ -362,27 +362,27 @@ rec {
       DTB = true;
       autoModules = true;
       preferBuiltin = true;
-      extraConfig = ''
+      extraStructuredConfig = with lib.kernel; {
         # Raspberry Pi 3 stuff. Not needed for   s >= 4.10.
-        ARCH_BCM2835 y
-        BCM2835_MBOX y
-        BCM2835_WDT y
-        RASPBERRYPI_FIRMWARE y
-        RASPBERRYPI_POWER y
-        SERIAL_8250_BCM2835AUX y
-        SERIAL_8250_EXTENDED y
-        SERIAL_8250_SHARE_IRQ y
+        ARCH_BCM2835 = yes;
+        BCM2835_MBOX = yes;
+        BCM2835_WDT = yes;
+        RASPBERRYPI_FIRMWARE = yes;
+        RASPBERRYPI_POWER = yes;
+        SERIAL_8250_BCM2835AUX = yes;
+        SERIAL_8250_EXTENDED = yes;
+        SERIAL_8250_SHARE_IRQ = yes;
 
         # Cavium ThunderX stuff.
-        PCI_HOST_THUNDER_ECAM y
+        PCI_HOST_THUNDER_ECAM = yes;
 
         # Nvidia Tegra stuff.
-        PCI_TEGRA y
+        PCI_TEGRA = yes;
 
         # The default (=y) forces us to have the XHCI firmware available in initrd,
         # which our initrd builder can't currently do easily.
-        USB_XHCI_TEGRA m
-      '';
+        USB_XHCI_TEGRA = module;
+      };
       target = "Image";
     };
     gcc = {
@@ -416,70 +416,69 @@ rec {
       name = "fuloong2f_n32";
       baseConfig = "lemote2f_defconfig";
       autoModules = false;
-      extraConfig = ''
-        MIGRATION n
-        COMPACTION n
+      extraStructuredConfig = with lib.kernel; {
+        MIGRATION = no;
+        COMPACTION = no;
 
         # nixos mounts some cgroup
-        CGROUPS y
+        CGROUPS = yes;
 
-        BLK_DEV_RAM y
-        BLK_DEV_INITRD y
-        BLK_DEV_CRYPTOLOOP m
-        BLK_DEV_DM m
-        DM_CRYPT m
-        MD y
-        REISERFS_FS m
-        EXT4_FS m
-        USB_STORAGE_CYPRESS_ATACB m
+        BLK_DEV_RAM = yes;
+        BLK_DEV_INITRD = yes;
+        BLK_DEV_CRYPTOLOOP = module;
+        BLK_DEV_DM = module;
+        DM_CRYPT = module;
+        MD = yes;
+        REISERFS_FS = module;
+        EXT4_FS = module;
+        USB_STORAGE_CYPRESS_ATACB = module;
 
-        IP_PNP y
-        IP_PNP_DHCP y
-        IP_PNP_BOOTP y
-        NFS_FS y
-        ROOT_NFS y
-        TUN m
-        NFS_V4 y
-        NFS_V4_1 y
-        NFS_FSCACHE y
-        NFSD m
-        NFSD_V2_ACL y
-        NFSD_V3 y
-        NFSD_V3_ACL y
-        NFSD_V4 y
+        IP_PNP = yes;
+        IP_PNP_DHCP = yes;
+        IP_PNP_BOOTP = yes;
+        NFS_FS = yes;
+        ROOT_NFS = yes;
+        TUN = module;
+        NFS_V4 = yes;
+        NFS_V4_1 = yes;
+        NFS_FSCACHE = yes;
+        NFSD = module;
+        NFSD_V2_ACL = yes;
+        NFSD_V3 = yes;
+        NFSD_V3_ACL = yes;
+        NFSD_V4 = yes;
 
         # Fail to build
-        DRM n
-        SCSI_ADVANSYS n
-        USB_ISP1362_HCD n
-        SND_SOC n
-        SND_ALI5451 n
-        FB_SAVAGE n
-        SCSI_NSP32 n
-        ATA_SFF n
-        SUNGEM n
-        IRDA n
-        ATM_HE n
-        SCSI_ACARD n
-        BLK_DEV_CMD640_ENHANCED n
+        DRM = no;
+        SCSI_ADVANSYS = no;
+        USB_ISP1362_HCD = no;
+        SND_SOC = no;
+        SND_ALI5451 = no;
+        FB_SAVAGE = no;
+        SCSI_NSP32 = no;
+        ATA_SFF = no;
+        SUNGEM = no;
+        IRDA = no;
+        ATM_HE = no;
+        SCSI_ACARD = no;
+        BLK_DEV_CMD640_ENHANCED = no;
 
-        FUSE_FS m
+        FUSE_FS = module;
 
         # Needed for udev >= 150
-        SYSFS_DEPRECATED_V2 n
+        SYSFS_DEPRECATED_V2 = no;
 
-        VGA_CONSOLE n
-        VT_HW_CONSOLE_BINDING y
-        SERIAL_8250_CONSOLE y
-        FRAMEBUFFER_CONSOLE y
-        EXT2_FS y
-        EXT3_FS y
-        REISERFS_FS y
-        MAGIC_SYSRQ y
+        VGA_CONSOLE = no;
+        VT_HW_CONSOLE_BINDING = yes;
+        SERIAL_8250_CONSOLE = yes;
+        FRAMEBUFFER_CONSOLE = yes;
+        EXT2_FS = yes;
+        EXT3_FS = yes;
+        MAGIC_SYSRQ = yes;
 
         # The kernel doesn't boot at all, with FTRACE
-        FTRACE n
-      '';
+        FTRACE = no;
+      };
       target = "vmlinux";
     };
     gcc = {
@@ -508,21 +507,20 @@ rec {
       autoModules = false;
       DTB = true;
       # for qemu 9p passthrough filesystem
-      extraConfig = ''
-        MIPS_MALTA y
-        PAGE_SIZE_4KB y
-        CPU_LITTLE_ENDIAN y
-        CPU_MIPS64_R2 y
-        64BIT y
-        CPU_MIPS64_R2 y
+      extraStructuredConfig = with lib.kernel; {
+        MIPS_MALTA = yes;
+        PAGE_SIZE_4KB = yes;
+        CPU_LITTLE_ENDIAN = yes;
+        CPU_MIPS64_R2 = yes;
+        "64BIT" = yes;
 
-        NET_9P y
-        NET_9P_VIRTIO y
-        9P_FS y
-        9P_FS_POSIX_ACL y
-        PCI y
-        VIRTIO_PCI y
-      '';
+        NET_9P = yes;
+        NET_9P_VIRTIO = yes;
+        "9P_FS" = yes;
+        "9P_FS_POSIX_ACL" = yes;
+        PCI = yes;
+        VIRTIO_PCI = yes;
+      };
     };
   };
 
@@ -537,9 +535,9 @@ rec {
       autoModules = true;
       baseConfig = "defconfig";
       DTB = true;
-      extraConfig = ''
-        SERIAL_OF_PLATFORM y
-      '';
+      extraStructuredConfig = with lib.kernel; {
+        SERIAL_OF_PLATFORM = yes;
+      };
     };
   };
 
