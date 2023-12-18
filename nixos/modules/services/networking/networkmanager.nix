@@ -61,22 +61,12 @@ let
     ResultAny=yes
     ResultInactive=no
     ResultActive=yes
-
-    [modem-manager]
-    Identity=unix-group:networkmanager
-    Action=org.freedesktop.ModemManager*
-    ResultAny=yes
-    ResultInactive=no
-    ResultActive=yes
   */
   polkitConf = ''
     polkit.addRule(function(action, subject) {
-      if (
-        subject.isInGroup("networkmanager")
-        && (action.id.indexOf("org.freedesktop.NetworkManager.") == 0
-            || action.id.indexOf("org.freedesktop.ModemManager")  == 0
-        ))
-          { return polkit.Result.YES; }
+      if (subject.isInGroup("networkmanager") && action.id.indexOf("org.freedesktop.NetworkManager.") == 0) {
+        return polkit.Result.YES;
+      }
     });
   '';
 
@@ -116,14 +106,12 @@ let
     '';
   };
 
-  packages = [
-    pkgs.modemmanager
-    pkgs.networkmanager
-  ]
-  ++ cfg.plugins
-  ++ lib.optionals (!delegateWireless && !enableIwd) [
-    pkgs.wpa_supplicant
-  ];
+  packages =
+    [ pkgs.networkmanager ]
+    ++ cfg.plugins
+    ++ lib.optionals (!delegateWireless && !enableIwd) [
+      pkgs.wpa_supplicant
+    ];
 
 in
 {
@@ -360,26 +348,6 @@ in
         '';
       };
 
-      fccUnlockScripts = mkOption {
-        type = types.listOf (types.submodule {
-          options = {
-            id = mkOption {
-              type = types.str;
-              description = lib.mdDoc "vid:pid of either the PCI or USB vendor and product ID";
-            };
-            path = mkOption {
-              type = types.path;
-              description = lib.mdDoc "Path to the unlock script";
-            };
-          };
-        });
-        default = [ ];
-        example = literalExpression ''[{ name = "03f0:4e1d"; script = "''${pkgs.modemmanager}/share/ModemManager/fcc-unlock.available.d/03f0:4e1d"; }]'';
-        description = lib.mdDoc ''
-          List of FCC unlock scripts to enable on the system, behaving as described in
-          https://modemmanager.org/docs/modemmanager/fcc-unlock/#integration-with-third-party-fcc-unlock-tools.
-        '';
-      };
       ensureProfiles = {
         profiles = with lib.types; mkOption {
           type = attrsOf (submodule {
@@ -456,6 +424,9 @@ in
       [ "networking" "networkmanager" "packages" ]
       [ "networking" "networkmanager" "plugins" ])
     (mkRenamedOptionModule [ "networking" "networkmanager" "useDnsmasq" ] [ "networking" "networkmanager" "dns" ])
+    (lib.mkRenamedOptionModule
+      [ "networking" "networkmanager" "fccUnlockScripts" ]
+      [ "networking" "modemmanager" "fccUnlockScripts" ])
     (mkRemovedOptionModule [ "networking" "networkmanager" "enableFccUnlock" ] ''
       This option was removed, because using bundled FCC unlock scripts is risky,
       might conflict with vendor-provided unlock scripts, and should
@@ -489,6 +460,13 @@ in
           Except if you mark some interfaces as <literal>unmanaged</literal> by NetworkManager.
         '';
       }
+      {
+        assertion = config.networking.modemmanager.enable;
+        message = ''
+          ModemManager is required for NetworkManager.
+          Please set networking.modemmanager.enable to true.
+        '';
+      }
     ];
 
     hardware.wirelessRegulatoryDatabase = true;
@@ -501,11 +479,6 @@ in
         source = "${pkg}/lib/NetworkManager/${pkg.networkManagerPlugin}";
       })
       cfg.plugins)
-    // builtins.listToAttrs (map
-      (e: nameValuePair "ModemManager/fcc-unlock.d/${e.id}" {
-        source = e.path;
-      })
-      cfg.fccUnlockScripts)
     // optionalAttrs (cfg.appendNameservers != [ ] || cfg.insertNameservers != [ ])
       {
         "NetworkManager/dispatcher.d/02overridedns".source = overrideNameserversScript;
@@ -564,8 +537,6 @@ in
     systemd.services.NetworkManager-wait-online = {
       wantedBy = [ "network-online.target" ];
     };
-
-    systemd.services.ModemManager.aliases = [ "dbus-org.freedesktop.ModemManager1.service" ];
 
     systemd.services.NetworkManager-dispatcher = {
       wantedBy = [ "network.target" ];
