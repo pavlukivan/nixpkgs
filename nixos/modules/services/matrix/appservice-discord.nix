@@ -25,8 +25,11 @@ in
 
       settings = lib.mkOption rec {
         # TODO: switch to lib.types.config.json as prescribed by RFC42 once it's implemented
-        type = lib.types.attrs;
-        apply = lib.recursiveUpdate default;
+        type = lib.types.attrs // {
+          merge = loc: builtins.foldl' (res: def: lib.recursiveUpdate res def.value) {};
+          emptyValue = { value = default; };
+        };
+
         default = {
           database = {
             filename = "${dataDir}/discord.db";
