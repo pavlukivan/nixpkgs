@@ -2938,12 +2938,6 @@ let
     {
       systemd.network.enable = mkDefault config.boot.initrd.network.enable;
       systemd.contents = mkUnitFiles "/etc/" cfg;
-
-      # Networkd link files are used early by udev to set up interfaces early.
-      # This must be done in stage 1 to avoid race conditions between udev and
-      # network daemons.
-      systemd.network.units = lib.filterAttrs (n: _: hasSuffix ".link" n) config.systemd.network.units;
-      systemd.storePaths = ["${config.boot.initrd.systemd.package}/lib/systemd/network/99-default.link"];
     }
 
     (mkIf cfg.enable {
